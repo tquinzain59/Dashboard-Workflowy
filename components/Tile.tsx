@@ -38,7 +38,7 @@ export default function Tile({ id, name, color, type, onJarvisClick }: TileProps
       if (type === 'aquarium') {
         await parseAquarium(items);
       } else if (type === 'finances') {
-        parseFinances(items);
+        await parseFinances(items);
       } else if (type === 'citations') {
         parseCitations(items);
       }
@@ -119,13 +119,24 @@ export default function Tile({ id, name, color, type, onJarvisClick }: TileProps
     }
   };
 
-  const parseFinances = (items: any[]) => {
-    if (items.length > 0) {
-      const latestItem = items.reduce((prev, current) => (prev.createdAt > current.createdAt) ? prev : current);
-      setParsedInfo({
-        balance: latestItem.name.replace(/<[^>]+>/g, ''),
-        date: new Date(latestItem.createdAt * 1000).toLocaleDateString('fr-FR')
-      });
+  const parseFinances = async (items: any[]) => {
+    try {
+      const mouvementsNode = items.find((i: any) => i.name.toLowerCase().includes("mouvements"));
+      if (mouvementsNode) {
+        const res = await fetch('/api/workflowy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_id: mouvementsNode.id }) });
+        const json = await res.json();
+        const mouvs = json.items || [];
+        
+        // Take the last 5 items
+        const last5 = mouvs.slice(-5).map((m: any) => m.name.replace(/<[^>]+>/g, ''));
+        
+        setParsedInfo((prev: any) => ({
+          ...prev,
+          mouvements: last5
+        }));
+      }
+    } catch (e) {
+      console.error("Erreur parseFinances", e);
     }
   };
 
@@ -184,11 +195,24 @@ export default function Tile({ id, name, color, type, onJarvisClick }: TileProps
             )}
             {type === 'finances' && (
               <div>
-                {loading ? <div className="skeleton line"></div> : (
+                {loading ? (
+                  <div>
+                    <div className="skeleton line"></div>
+                    <div className="skeleton line short"></div>
+                    <div className="skeleton line"></div>
+                  </div>
+                ) : (
                   <>
-                    <p style={{margin: '0 0 8px 0'}}>Dernier solde / Facture :</p>
-                    <div className="tile-value" style={{fontSize: '1.5rem'}}>{parsedInfo?.balance || 'Aucune donnée'}</div>
-                    <div className="tile-date">{parsedInfo?.date}</div>
+                    <p style={{margin: '0 0 12px 0', fontSize: '0.95rem', fontWeight: 500}}>5 derniers mouvements :</p>
+                    {parsedInfo?.mouvements && parsedInfo.mouvements.length > 0 ? (
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', lineHeight: '1.6', color: 'var(--text-primary)' }}>
+                        {parsedInfo.mouvements.map((m: string, i: number) => (
+                          <li key={i}>{m}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p style={{ fontSize: '0.9rem' }}>Aucun mouvement trouvé.</p>
+                    )}
                   </>
                 )}
               </div>

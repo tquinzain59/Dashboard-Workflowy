@@ -36,7 +36,7 @@ export default function Tile({ id, name, color, type, onJarvisClick }: TileProps
 
       // Parse specific data for special tile types
       if (type === 'aquarium') {
-        parseAquarium(items);
+        await parseAquarium(items);
       } else if (type === 'finances') {
         parseFinances(items);
       } else if (type === 'citations') {
@@ -66,17 +66,56 @@ export default function Tile({ id, name, color, type, onJarvisClick }: TileProps
     setExpanded(!expanded);
   };
 
-  // Parsers for specific node types based on typical Workflowy list structures
-  const parseAquarium = (items: any[]) => {
-    // Looks for "population actuelle" or latest date
-    // Sort items by modifiedAt or assume latest is last/first. Let's take the first item as the most recent day.
-    if (items.length > 0) {
-      const latestItem = items.reduce((prev, current) => (prev.createdAt > current.createdAt) ? prev : current);
-      // We will just show its name as the latest param
+  const parseAquarium = async (items: any[]) => {
+    try {
+      let dateStr = "";
+      let paramVal = "Aucun paramètre trouvé";
+      let totalPop = 0;
+
+      const popNode = items.find((i: any) => i.name.includes("Population actuelle"));
+      const paramNode = items.find((i: any) => i.name.includes("Paramètres"));
+
+      if (paramNode) {
+        const paramRes = await fetch('/api/workflowy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_id: paramNode.id }) });
+        const paramJson = await paramRes.json();
+        const dates = paramJson.items || [];
+        if (dates.length > 0) {
+          dates.sort((a: any, b: any) => b.createdAt - a.createdAt);
+          const latestDate = dates[0];
+          dateStr = latestDate.name.replace(/<[^>]+>/g, '');
+
+          const valRes = await fetch('/api/workflowy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_id: latestDate.id }) });
+          const valJson = await valRes.json();
+          if (valJson.items && valJson.items.length > 0) {
+            paramVal = valJson.items.map((i: any) => i.name.replace(/<[^>]+>/g, '')).join(", ");
+          }
+        }
+      }
+
+      if (popNode) {
+        const popRes = await fetch('/api/workflowy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_id: popNode.id }) });
+        const popJson = await popRes.json();
+        const species = popJson.items || [];
+
+        for (const sp of species) {
+          const spRes = await fetch('/api/workflowy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_id: sp.id }) });
+          const spJson = await spRes.json();
+          if (spJson.items && spJson.items.length > 0) {
+            const countMatch = spJson.items[0].name.replace(/<[^>]+>/g, '').match(/\d+/);
+            if (countMatch) {
+              totalPop += parseInt(countMatch[0], 10);
+            }
+          }
+        }
+      }
+
       setParsedInfo({
-        param: latestItem.name.replace(/<[^>]+>/g, ''), // strip HTML
-        date: new Date(latestItem.createdAt * 1000).toLocaleDateString('fr-FR')
+        param: paramVal,
+        date: dateStr,
+        population: totalPop
       });
+    } catch (e) {
+      console.error("Erreur parseAquarium", e);
     }
   };
 
@@ -124,11 +163,21 @@ export default function Tile({ id, name, color, type, onJarvisClick }: TileProps
             {type === 'jarvis' && <p>Paramètres système & mémoire</p>}
             {type === 'aquarium' && (
               <div>
-                {loading ? <div className="skeleton line"></div> : (
+                {loading ? (
+                  <div>
+                    <div className="skeleton line"></div>
+                    <div className="skeleton line short"></div>
+                  </div>
+                ) : (
                   <>
-                    <p style={{margin: '0 0 8px 0'}}>Dernier paramètre :</p>
-                    <div className="tile-value" style={{fontSize: '1.2rem', lineHeight: '1.4'}}>{parsedInfo?.param || 'Aucune donnée'}</div>
-                    <div className="tile-date">{parsedInfo?.date}</div>
+                    <div style={{ marginBottom: '16px' }}>
+                      <p style={{margin: '0 0 4px 0', fontSize: '0.9rem'}}>Paramètres ({parsedInfo?.date || 'N/A'}) :</p>
+                      <div className="tile-value" style={{fontSize: '1.2rem', lineHeight: '1.4', margin: 0}}>{parsedInfo?.param || 'Aucune donnée'}</div>
+                    </div>
+                    <div>
+                      <p style={{margin: '0 0 4px 0', fontSize: '0.9rem'}}>Population totale :</p>
+                      <div className="tile-value" style={{fontSize: '2rem', margin: 0}}>{parsedInfo?.population || 0} <span style={{fontSize: '1rem', color: 'var(--text-secondary)'}}>poissons</span></div>
+                    </div>
                   </>
                 )}
               </div>

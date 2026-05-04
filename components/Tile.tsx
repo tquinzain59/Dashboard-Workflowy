@@ -25,22 +25,40 @@ export default function Tile({ id, name, color, type, onJarvisClick }: TileProps
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/workflowy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item_id: id })
-      });
-      const json = await res.json();
-      const items = json.items || [];
-      setData(items);
+      if (type === 'weather') {
+        const res = await fetch('/api/weather');
+        const data = await res.json();
+        setParsedInfo(data);
+      } else if (type === 'calendar') {
+        const res = await fetch('/api/google/calendar');
+        if (res.ok) {
+          const data = await res.json();
+          setParsedInfo(data);
+        } else setParsedInfo({ error: 'Non connecté' });
+      } else if (type === 'gmail') {
+        const res = await fetch('/api/google/gmail');
+        if (res.ok) {
+          const data = await res.json();
+          setParsedInfo(data);
+        } else setParsedInfo({ error: 'Non connecté' });
+      } else {
+        const res = await fetch('/api/workflowy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ item_id: id })
+        });
+        const json = await res.json();
+        const items = json.items || [];
+        setData(items);
 
-      // Parse specific data for special tile types
-      if (type === 'aquarium') {
-        await parseAquarium(items);
-      } else if (type === 'finances') {
-        await parseFinances(items);
-      } else if (type === 'citations') {
-        parseCitations(items);
+        // Parse specific data for special tile types
+        if (type === 'aquarium') {
+          await parseAquarium(items);
+        } else if (type === 'finances') {
+          await parseFinances(items);
+        } else if (type === 'citations') {
+          parseCitations(items);
+        }
       }
     } catch (e) {
       console.error("Failed to fetch data for tile", id);
@@ -223,6 +241,60 @@ export default function Tile({ id, name, color, type, onJarvisClick }: TileProps
                   <blockquote style={{margin: 0, fontStyle: 'italic', color: 'var(--text-secondary)'}}>
                     "{parsedInfo?.quote || 'Aucune citation'}"
                   </blockquote>
+                )}
+              </div>
+            )}
+            {type === 'weather' && (
+              <div>
+                {loading ? <div className="skeleton line"></div> : (
+                  <>
+                    <p style={{margin: '0 0 8px 0', fontSize: '0.9rem'}}>Température actuelle :</p>
+                    <div className="tile-value" style={{fontSize: '2rem'}}>{parsedInfo?.temperature || '--'}°C</div>
+                    <div className="tile-date">Vent : {parsedInfo?.windspeed || '--'} km/h</div>
+                  </>
+                )}
+              </div>
+            )}
+            {type === 'calendar' && (
+              <div>
+                {loading ? <div className="skeleton line"></div> : parsedInfo?.error ? <p style={{fontSize:'0.9rem', color:'red'}}>⚠️ Veuillez vous connecter avec Google en haut à droite.</p> : (
+                  <>
+                    <p style={{margin: '0 0 12px 0', fontSize: '0.95rem', fontWeight: 500}}>Prochains RDV :</p>
+                    {parsedInfo && parsedInfo.length > 0 ? (
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', lineHeight: '1.6', color: 'var(--text-primary)' }}>
+                        {parsedInfo.map((ev: any) => {
+                          const date = new Date(ev.start?.dateTime || ev.start?.date || Date.now());
+                          return (
+                            <li key={ev.id}>
+                              <strong>{date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}</strong> - {ev.summary}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p style={{fontSize:'0.9rem'}}>Aucun événement prévu.</p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+            {type === 'gmail' && (
+              <div>
+                {loading ? <div className="skeleton line"></div> : parsedInfo?.error ? <p style={{fontSize:'0.9rem', color:'red'}}>⚠️ Veuillez vous connecter avec Google en haut à droite.</p> : (
+                  <>
+                    <p style={{margin: '0 0 12px 0', fontSize: '0.95rem', fontWeight: 500}}>Derniers e-mails :</p>
+                    {parsedInfo && parsedInfo.length > 0 ? (
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', lineHeight: '1.4', color: 'var(--text-primary)' }}>
+                        {parsedInfo.map((msg: any) => (
+                          <li key={msg.id} style={{marginBottom: '8px'}}>
+                            <strong>{msg.from}</strong>:<br/>{msg.subject}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p style={{fontSize:'0.9rem'}}>Aucun message important.</p>
+                    )}
+                  </>
                 )}
               </div>
             )}

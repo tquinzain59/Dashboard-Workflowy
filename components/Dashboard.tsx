@@ -1,11 +1,15 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useSession, signIn, signOut } from "next-auth/react";
 import Tile from './Tile';
 import TreeView from './TreeView';
 
 const TARGET_NODES = [
-  { id: "08a049b5-462c-40c0-99f3-1e804e59a346", name: "🤖 Jarvis", color: "var(--pastel-blue)", type: "jarvis" },
+  { id: "weather", name: "☁️ Météo Lille", color: "var(--pastel-blue)", type: "weather" },
+  { id: "calendar", name: "📅 Mon Agenda", color: "var(--pastel-yellow)", type: "calendar" },
+  { id: "gmail", name: "📧 Gmail Urgents", color: "var(--pastel-red)", type: "gmail" },
+  { id: "08a049b5-462c-40c0-99f3-1e804e59a346", name: "🤖 Jarvis", color: "var(--pastel-teal)", type: "jarvis" },
   { id: "4d8fe5ba-e7ff-ab16-6f56-f0e27065ec4f", name: "👦 Léonard", color: "var(--pastel-green)", type: "lecture" },
   { id: "9ae75ce1-172b-613b-1924-66e2e8013ace", name: "🦱 Eliott", color: "var(--pastel-yellow)", type: "lecture" },
   { id: "dd614930-5f64-80b3-359f-5c0596ab3f7e", name: "📝 Utiles", color: "var(--pastel-purple)", type: "lecture" },
@@ -24,13 +28,36 @@ const TARGET_NODES = [
 ];
 
 export default function Dashboard() {
+  const { data: session } = useSession();
   const [jarvisOpen, setJarvisOpen] = useState(false);
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <h1 className="dashboard-title">Mon Espace</h1>
-        <p className="dashboard-subtitle">Synchronisé en temps réel avec Workflowy</p>
+      <header className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 className="dashboard-title">Mon Espace</h1>
+          <p className="dashboard-subtitle">Synchronisé en temps réel avec Workflowy & Google</p>
+        </div>
+        <div>
+          {session ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Connecté: {session.user?.email}</span>
+              <button 
+                onClick={() => signOut()} 
+                style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}
+              >
+                Déconnexion
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={() => signIn('google')} 
+              style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: 'var(--text-primary)', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}
+            >
+              Google Connexion
+            </button>
+          )}
+        </div>
       </header>
 
       <div className="grid">

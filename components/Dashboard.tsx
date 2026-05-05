@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useSession, signIn, signOut } from "next-auth/react";
-import Tile from './Tile';
+import TileDispatcher from './TileDispatcher';
 import TreeView from './TreeView';
 
 const TARGET_NODES = [
@@ -61,14 +61,11 @@ export default function Dashboard() {
       </header>
 
       <div className="grid">
-        {TARGET_NODES.map((node) => (
-          <Tile 
+        {TARGET_NODES.map(node => (
+          <TileDispatcher 
             key={node.id}
-            id={node.id}
-            name={node.name}
-            color={node.color}
-            type={node.type}
-            onJarvisClick={() => setJarvisOpen(true)}
+            {...node}
+            onJarvisClick={node.type === 'jarvis' ? () => setJarvisOpen(true) : undefined}
           />
         ))}
       </div>

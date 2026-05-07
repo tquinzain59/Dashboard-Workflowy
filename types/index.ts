@@ -27,6 +27,12 @@ export interface GmailMessage {
   subject: string;
 }
 
+export interface ExpensesData {
+  openRouter?: { daily: string; weekly: string; monthly: string };
+  deepSeek?: { solde: string; aujourdHui: string; appels: string; tokens: string };
+  totalAujourdHui?: string;
+}
+
 export interface TileConfig {
   id: string;
   name: string;

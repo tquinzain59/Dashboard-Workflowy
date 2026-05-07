@@ -6,6 +6,7 @@ import AquariumTile from './tiles/AquariumTile';
 import FinancesTile from './tiles/FinancesTile';
 import CitationsTile from './tiles/CitationsTile';
 import FolderTile from './tiles/FolderTile';
+import ExpensesTile from './tiles/ExpensesTile';
 import { TileConfig } from '@/types';
 
 export default function TileDispatcher(props: TileConfig) {
@@ -29,6 +30,8 @@ export default function TileDispatcher(props: TileConfig) {
       return <FinancesTile {...tileProps} />;
     case 'citations':
       return <CitationsTile {...tileProps} />;
+    case 'expenses':
+      return <ExpensesTile {...tileProps} />;
     case 'lecture':
     case 'jarvis':
     default:

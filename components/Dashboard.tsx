@@ -10,6 +10,7 @@ const TARGET_NODES = [
   { id: "calendar", name: "📅 Mon Agenda", color: "var(--metro-yellow)", type: "calendar" },
   { id: "gmail", name: "📧 Gmail Urgents", color: "var(--metro-red)", type: "gmail" },
   { id: "08a049b5-462c-40c0-99f3-1e804e59a346", name: "🤖 Jarvis", color: "var(--metro-teal)", type: "jarvis" },
+  { id: "938087e84c8c", name: "💸 Dépenses LLM", color: "var(--metro-purple)", type: "expenses" },
   { id: "4d8fe5ba-e7ff-ab16-6f56-f0e27065ec4f", name: "👦 Léonard", color: "var(--metro-green)", type: "lecture" },
   { id: "9ae75ce1-172b-613b-1924-66e2e8013ace", name: "🦱 Eliott", color: "var(--metro-orange)", type: "lecture" },
   { id: "dd614930-5f64-80b3-359f-5c0596ab3f7e", name: "📝 Utiles", color: "var(--metro-purple)", type: "lecture" },

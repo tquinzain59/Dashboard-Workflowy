@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { WorkflowyNode } from '@/types';
+import { WorkflowyNode, ExpensesData } from '@/types';
 
 export function useWorkflowyNode(nodeId: string, autoFetch: boolean = true) {
   const [items, setItems] = useState<WorkflowyNode[]>([]);
@@ -133,3 +133,71 @@ export function useCitations(nodeId: string) {
 
   return { quote, loading };
 }
+
+export function useExpenses(nodeId: string) {
+  const { items, loading } = useWorkflowyNode(nodeId, true);
+  const [parsedData, setParsedData] = useState<ExpensesData | null>(null);
+
+  useEffect(() => {
+    async function parseData() {
+      if (!items || items.length === 0) return;
+      
+      // Sort to get the latest date entry
+      const sortedDates = [...items].sort((a: any, b: any) => b.createdAt - a.createdAt);
+      const latestDate = sortedDates[0];
+      
+      const res = await fetch('/api/workflowy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_id: latestDate.id }) });
+      const json = await res.json();
+      const logs = json.items || [];
+      
+      let data: ExpensesData = {};
+      
+      for (const log of logs) {
+        const text = log.name.replace(/<[^>]+>/g, ''); // Remove HTML
+        
+        // Match OpenRouter
+        if (text.includes("OpenRouter")) {
+          const dailyMatch = text.match(/Daily:\s*([\d.]+\$)/);
+          const weeklyMatch = text.match(/Weekly:\s*([\d.]+\$)/);
+          const monthlyMatch = text.match(/Monthly:\s*([\d.]+\$)/);
+          data.openRouter = {
+            daily: dailyMatch ? dailyMatch[1] : '--',
+            weekly: weeklyMatch ? weeklyMatch[1] : '--',
+            monthly: monthlyMatch ? monthlyMatch[1] : '--',
+          };
+        }
+        
+        // Match DeepSeek
+        if (text.includes("DeepSeek")) {
+          const soldeMatch = text.match(/Solde:\s*([\d.]+\$)/);
+          const aujourdHuiMatch = text.match(/Aujourd'hui:\s*([\d.]+\$)/);
+          const appelsMatch = text.match(/Appels:\s*(\d+)/);
+          const tokensMatch = text.match(/Tokens:\s*([\w\d]+)/);
+          data.deepSeek = {
+            solde: soldeMatch ? soldeMatch[1] : '--',
+            aujourdHui: aujourdHuiMatch ? aujourdHuiMatch[1] : '--',
+            appels: appelsMatch ? appelsMatch[1] : '--',
+            tokens: tokensMatch ? tokensMatch[1] : '--',
+          };
+        }
+        
+        // Match Total
+        if (text.includes("Total aujourd'hui")) {
+          const totalMatch = text.match(/Total aujourd'hui:\s*([\d.]+\$)/);
+          if (totalMatch) {
+            data.totalAujourdHui = totalMatch[1];
+          }
+        }
+      }
+      
+      setParsedData(data);
+    }
+    
+    if (items.length > 0 && !parsedData) {
+      parseData();
+    }
+  }, [items, parsedData]);
+
+  return { parsedData, loading: loading || (!parsedData && items.length > 0) };
+}
+

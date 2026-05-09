@@ -150,7 +150,9 @@ export function useExpenses(nodeId: string) {
       const json = await res.json();
       const logs = json.items || [];
       
-      let data: ExpensesData = {};
+      let data: ExpensesData = {
+        date: latestDate.name.replace(/<[^>]+>/g, '') // "📅 2026-05-07" ou "2026-05-07"
+      };
       
       for (const log of logs) {
         const text = log.name.replace(/<[^>]+>/g, ''); // Remove HTML

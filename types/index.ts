@@ -28,6 +28,7 @@ export interface GmailMessage {
 }
 
 export interface ExpensesData {
+  date?: string;
   openRouter?: { daily: string; weekly: string; monthly: string };
   deepSeek?: { solde: string; aujourdHui: string; appels: string; tokens: string };
   totalAujourdHui?: string;

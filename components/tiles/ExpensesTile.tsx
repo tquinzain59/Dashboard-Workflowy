@@ -16,6 +16,12 @@ export default function ExpensesTile(props: BaseTileProps) {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', color: '#fff' }}>
+          {parsedData?.date && (
+            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' }}>
+              Dépenses du : <strong>{parsedData.date.replace('📅 ', '')}</strong>
+            </div>
+          )}
+          
           {parsedData?.openRouter && (
             <div>
               <p style={{ margin: '0 0 4px 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>🌐 OpenRouter</p>

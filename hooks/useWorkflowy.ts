@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 import { WorkflowyNode, ExpensesData } from '@/types';
 
+export const parseDateFromName = (name: string): Date | null => {
+  if (!name) return null;
+  const rawName = name.replace(/<[^>]+>/g, '');
+  let match = rawName.match(/📅\s*(\d{4}-\d{2}-\d{2})/);
+  if (match) return new Date(match[1]);
+  match = rawName.match(/📅\s*(\d{2})\/(\d{2})\/(\d{4})/);
+  if (match) return new Date(`${match[3]}-${match[2]}-${match[1]}`);
+  return null;
+};
+
 export function useWorkflowyNode(nodeId: string, autoFetch: boolean = true) {
   const [items, setItems] = useState<WorkflowyNode[]>([]);
   const [loading, setLoading] = useState(false);

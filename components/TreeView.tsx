@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { parseDateFromName } from '@/hooks/useWorkflowy';
 
 interface TreeViewProps {
   item: any;
@@ -76,6 +77,15 @@ export default function TreeView({ item, defaultExpanded = false }: TreeViewProp
   const normalChildren = children.filter(c => !isSpecialChild(c));
   const hasSpecialChildren = children.some(isSpecialChild);
 
+  const sortedNormalChildren = [...normalChildren].sort((a, b) => {
+    const dateA = parseDateFromName(a.name);
+    const dateB = parseDateFromName(b.name);
+    if (dateA && dateB) {
+      return dateB.getTime() - dateA.getTime();
+    }
+    return 0;
+  });
+
   const renderSpecialChildren = () => {
     const resume = children.find(c => c.name.replace(/<[^>]+>/g, '').toLowerCase().includes("résumé"));
     const source = children.find(c => c.name.replace(/<[^>]+>/g, '').toLowerCase().includes("source"));
@@ -126,7 +136,7 @@ export default function TreeView({ item, defaultExpanded = false }: TreeViewProp
         <div className="tree-children">
           {hasSpecialChildren && renderSpecialChildren()}
           
-          {normalChildren.length > 0 && normalChildren.map(child => (
+          {sortedNormalChildren.length > 0 && sortedNormalChildren.map(child => (
             <TreeView key={child.id} item={child} />
           ))}
         </div>

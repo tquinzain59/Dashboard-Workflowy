@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BaseTileProps } from '@/types';
 import TileContainer from '../TileContainer';
-import { useWorkflowyNode } from '@/hooks/useWorkflowy';
+import { useWorkflowyNode, parseDateFromName } from '@/hooks/useWorkflowy';
 import TreeView from '../TreeView';
 
 export default function FolderTile(props: BaseTileProps) {
@@ -19,6 +19,15 @@ export default function FolderTile(props: BaseTileProps) {
     }
     setExpanded(!expanded);
   };
+
+  const sortedItems = [...items].sort((a, b) => {
+    const dateA = parseDateFromName(a.name);
+    const dateB = parseDateFromName(b.name);
+    if (dateA && dateB) {
+      return dateB.getTime() - dateA.getTime();
+    }
+    return 0;
+  });
 
   return (
     <TileContainer {...props} expanded={expanded} onExpandToggle={handleExpandToggle}>
@@ -38,7 +47,7 @@ export default function FolderTile(props: BaseTileProps) {
               <div className="skeleton line"></div>
             </div>
           ) : (
-            items.map((item) => (
+            sortedItems.map((item) => (
               <TreeView key={item.id} item={item} />
             ))
           )}

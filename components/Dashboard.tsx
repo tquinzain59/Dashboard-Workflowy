@@ -17,7 +17,7 @@ const TARGET_NODES = [
   { id: "85126189-645a-0ca0-42ef-89c1e40fe990", name: "📥 Inbox", color: "var(--metro-grey)", type: "lecture" },
   { id: "891e76c6-24d4-86a1-0616-78a487ec8c2d", name: "🐠 Aquarium", color: "var(--metro-teal)", type: "aquarium" },
   { id: "88b90ad4-272b-b276-20e2-572d6141243b", name: "✅ Reminder", color: "var(--metro-orange)", type: "lecture" },
-  { id: "96879b8a-12f6-4496-bd9e-0f8bc39beacd", name: "🔬 Veille technologique", color: "var(--metro-pink)", type: "lecture" },
+  { id: "1059e7ea-24d9-49c4-a4fd-c46024f9ad62", name: "🔬 Veille technologique", color: "var(--metro-pink)", type: "lecture" },
   { id: "df2b3606-b072-057d-0d24-23b637b084e3", name: "✅ Projects", color: "var(--metro-blue)", type: "lecture" },
   { id: "f5f05c51-fe5c-2851-d65e-28da8c780204", name: "👨🏫 Définition", color: "var(--metro-yellow)", type: "lecture" },
   { id: "7d180011-0a56-388c-26af-330998f2f5cd", name: "🦾 Tools", color: "var(--metro-purple)", type: "lecture" },

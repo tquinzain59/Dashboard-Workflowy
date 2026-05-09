@@ -1,4 +1,7 @@
+"use client";
+
 import React from 'react';
+import { useSession } from 'next-auth/react';
 
 interface TileContainerProps {
   color: string;
@@ -10,6 +13,8 @@ interface TileContainerProps {
 }
 
 export default function TileContainer({ color, icon, title, expanded, onExpandToggle, children }: TileContainerProps) {
+  const { data: session } = useSession();
+
   return (
     <div 
       className={`tile ${expanded ? 'expanded' : ''}`} 
@@ -29,7 +34,13 @@ export default function TileContainer({ color, icon, title, expanded, onExpandTo
       </div>
 
       <div className="tile-content">
-        {children}
+        {!session ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', opacity: 0.8, textAlign: 'center', padding: '20px 0' }}>
+            <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>🔒 Connectez-vous pour voir le contenu</p>
+          </div>
+        ) : (
+          children
+        )}
       </div>
     </div>
   );

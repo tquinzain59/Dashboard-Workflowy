@@ -63,7 +63,12 @@ export function useAquarium(nodeId: string) {
           const valRes = await fetch('/api/workflowy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_id: latestDate.id }) });
           const valJson = await valRes.json();
           if (valJson.items && valJson.items.length > 0) {
-            paramVal = valJson.items.map((i: any) => i.name.replace(/<[^>]+>/g, '')).join(", ");
+            paramVal = valJson.items.map((i: any) => {
+              return i.name.replace(/<[^>]+>/g, '')
+                           .replace(/&lt;/g, '<')
+                           .replace(/&gt;/g, '>')
+                           .replace(/&amp;/g, '&');
+            }).join(", ");
           }
         }
       }

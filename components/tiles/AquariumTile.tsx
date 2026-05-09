@@ -19,7 +19,7 @@ export default function AquariumTile(props: BaseTileProps) {
             <p style={{margin: '0 0 8px 0', fontSize: '0.9rem'}}>Paramètres ({parsedData?.date || 'N/A'}) :</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
               {parsedData?.param ? (
-                parsedData.param.split(',').map((p, i) => (
+                parsedData.param.split(', ').map((p, i) => (
                   <span key={i} style={{
                     background: 'rgba(255, 255, 255, 0.15)',
                     padding: '4px 8px',

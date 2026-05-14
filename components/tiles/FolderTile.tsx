@@ -9,13 +9,8 @@ export default function FolderTile(props: BaseTileProps) {
   const { items, loading, fetchNode } = useWorkflowyNode(props.id, false);
 
   const handleExpandToggle = () => {
-    if (props.type === 'jarvis' && props.onJarvisClick) {
-      props.onJarvisClick();
-      return;
-    }
-
-    if (props.type === 'ideas' && props.onIdeasClick) {
-      props.onIdeasClick();
+    if (props.onAction) {
+      props.onAction();
       return;
     }
     
@@ -38,9 +33,9 @@ export default function FolderTile(props: BaseTileProps) {
     <TileContainer {...props} expanded={expanded} onExpandToggle={handleExpandToggle}>
       {!expanded && (
         <>
-          {props.type === 'lecture' && <p>Cliquez pour lire le contenu</p>}
-          {props.type === 'jarvis' && <p>Paramètres système & mémoire</p>}
-          {props.type === 'ideas' && <p>Analyses nocturnes en Markdown</p>}
+          {props.type === 'jarvis' ? <p>Paramètres système & mémoire</p> :
+           props.type === 'ideas' ? <p>Analyses nocturnes en Markdown</p> :
+           <p>Cliquez pour lire le contenu</p>}
         </>
       )}
 

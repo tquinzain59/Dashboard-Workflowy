@@ -32,8 +32,7 @@ const TARGET_NODES = [
 
 export default function Dashboard() {
   const { data: session } = useSession();
-  const [jarvisOpen, setJarvisOpen] = useState(false);
-  const [ideasOpen, setIdeasOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<'jarvis' | 'ideas' | null>(null);
 
   return (
     <div className="dashboard-container">
@@ -69,26 +68,31 @@ export default function Dashboard() {
           <TileDispatcher 
             key={node.id}
             {...node}
-            onJarvisClick={node.type === 'jarvis' ? () => setJarvisOpen(true) : undefined}
-            onIdeasClick={node.type === 'ideas' ? () => setIdeasOpen(true) : undefined}
+            onAction={
+              node.type === 'jarvis' ? () => setActiveModal('jarvis') :
+              node.type === 'ideas' ? () => setActiveModal('ideas') :
+              undefined
+            }
           />
         ))}
       </div>
 
-      {jarvisOpen && (
-        <div className="fullscreen-modal">
-          <button className="fullscreen-close" onClick={() => setJarvisOpen(false)}>×</button>
-          <h2 className="fullscreen-title">🤖 Jarvis - Openclaw & Mémoire</h2>
-          <div className="tree-container" style={{fontSize: '1.2rem'}}>
-            <TreeView item={{id: "08a049b5-462c-40c0-99f3-1e804e59a346", name: "Paramètres Système"}} defaultExpanded={true} />
-          </div>
-        </div>
-      )}
+      {activeModal && (
+        <div className="fullscreen-modal" style={activeModal === 'ideas' ? { padding: 0, overflow: 'hidden' } : {}}>
+          <button className="fullscreen-close" onClick={() => setActiveModal(null)} style={{ zIndex: 100 }}>×</button>
+          
+          {activeModal === 'jarvis' && (
+            <>
+              <h2 className="fullscreen-title">🤖 Jarvis - Openclaw & Mémoire</h2>
+              <div className="tree-container" style={{fontSize: '1.2rem'}}>
+                <TreeView item={{id: "08a049b5-462c-40c0-99f3-1e804e59a346", name: "Paramètres Système", note: "", createdAt: 0, updatedAt: 0}} defaultExpanded={true} />
+              </div>
+            </>
+          )}
 
-      {ideasOpen && (
-        <div className="fullscreen-modal" style={{ padding: 0, overflow: 'hidden' }}>
-          <button className="fullscreen-close" onClick={() => setIdeasOpen(false)} style={{ zIndex: 100 }}>×</button>
-          <IdeasView />
+          {activeModal === 'ideas' && (
+            <IdeasView />
+          )}
         </div>
       )}
     </div>

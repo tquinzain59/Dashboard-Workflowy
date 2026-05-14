@@ -1,10 +1,14 @@
 export interface WorkflowyNode {
   id: string;
   name: string;
+  nm?: string;
   note: string;
+  no?: string;
   createdAt: number;
   updatedAt: number;
   isComplete?: boolean;
+  items?: WorkflowyNode[];
+  ch?: WorkflowyNode[];
 }
 
 export interface WeatherInfo {
@@ -39,8 +43,7 @@ export interface TileConfig {
   name: string;
   color: string;
   type: string;
-  onJarvisClick?: () => void;
-  onIdeasClick?: () => void;
+  onAction?: () => void;
 }
 
 export interface BaseTileProps extends TileConfig {

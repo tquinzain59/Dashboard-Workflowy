@@ -1,55 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-
-interface WorkflowyNode {
-  id: string;
-  nm?: string;
-  no?: string;
-  ch?: WorkflowyNode[];
-  name?: string;
-  note?: string;
-  items?: WorkflowyNode[];
-}
+import { WorkflowyNode } from '@/types';
+import { useWorkflowyNode } from '@/hooks/useWorkflowy';
 
 export default function IdeasView() {
-  const [nodes, setNodes] = useState<WorkflowyNode[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { items: nodes, loading, error } = useWorkflowyNode('1d3b1005-3314-4f0d-b907-566be6818799', true);
   
   const [selectedNode, setSelectedNode] = useState<WorkflowyNode | null>(null);
   const [markdownContent, setMarkdownContent] = useState<string | null>(null);
   const [contentLoading, setContentLoading] = useState(false);
-
-  useEffect(() => {
-    fetchIdeas();
-  }, []);
-
-  const fetchIdeas = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch('/api/workflowy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item_id: '1d3b1005-3314-4f0d-b907-566be6818799' })
-      });
-      
-      if (!res.ok) {
-        throw new Error('Failed to fetch Ideas from Workflowy');
-      }
-      
-      const data = await res.json();
-      if (data && (data.items || data.ch)) {
-        setNodes(data.items || data.ch);
-      } else {
-        setNodes([]);
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const extractDriveId = (text?: string) => {
     if (!text) return null;

@@ -3,9 +3,12 @@ import ReactMarkdown from 'react-markdown';
 
 interface WorkflowyNode {
   id: string;
-  nm: string;
+  nm?: string;
   no?: string;
   ch?: WorkflowyNode[];
+  name?: string;
+  note?: string;
+  items?: WorkflowyNode[];
 }
 
 export default function IdeasView() {

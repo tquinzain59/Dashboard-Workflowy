@@ -34,6 +34,7 @@ export default function TileDispatcher(props: TileConfig) {
       return <ExpensesTile {...tileProps} />;
     case 'lecture':
     case 'jarvis':
+    case 'ideas':
     default:
       return <FolderTile {...tileProps} />;
   }

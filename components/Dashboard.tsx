@@ -4,12 +4,14 @@ import React, { useState } from 'react';
 import { useSession, signIn, signOut } from "next-auth/react";
 import TileDispatcher from './TileDispatcher';
 import TreeView from './TreeView';
+import IdeasView from './IdeasView';
 
 const TARGET_NODES = [
   { id: "weather", name: "☁️ Météo Lille", color: "var(--metro-blue)", type: "weather" },
   { id: "calendar", name: "📅 Mon Agenda", color: "var(--metro-yellow)", type: "calendar" },
   { id: "gmail", name: "📧 Gmail Urgents", color: "var(--metro-red)", type: "gmail" },
   { id: "08a049b5-462c-40c0-99f3-1e804e59a346", name: "🤖 Jarvis", color: "var(--metro-teal)", type: "jarvis" },
+  { id: "566be6818799", name: "💡 Ideas", color: "var(--metro-yellow)", type: "ideas" },
   { id: "88e43dd4-f6e9-4bc8-bf0c-938087e84c8c", name: "💸 Dépenses LLM", color: "var(--metro-purple)", type: "expenses" },
   { id: "4d8fe5ba-e7ff-ab16-6f56-f0e27065ec4f", name: "👦 Léonard", color: "var(--metro-green)", type: "lecture" },
   { id: "9ae75ce1-172b-613b-1924-66e2e8013ace", name: "🦱 Eliott", color: "var(--metro-orange)", type: "lecture" },
@@ -31,6 +33,7 @@ const TARGET_NODES = [
 export default function Dashboard() {
   const { data: session } = useSession();
   const [jarvisOpen, setJarvisOpen] = useState(false);
+  const [ideasOpen, setIdeasOpen] = useState(false);
 
   return (
     <div className="dashboard-container">
@@ -67,6 +70,7 @@ export default function Dashboard() {
             key={node.id}
             {...node}
             onJarvisClick={node.type === 'jarvis' ? () => setJarvisOpen(true) : undefined}
+            onIdeasClick={node.type === 'ideas' ? () => setIdeasOpen(true) : undefined}
           />
         ))}
       </div>
@@ -78,6 +82,13 @@ export default function Dashboard() {
           <div className="tree-container" style={{fontSize: '1.2rem'}}>
             <TreeView item={{id: "08a049b5-462c-40c0-99f3-1e804e59a346", name: "Paramètres Système"}} defaultExpanded={true} />
           </div>
+        </div>
+      )}
+
+      {ideasOpen && (
+        <div className="fullscreen-modal" style={{ padding: 0, overflow: 'hidden' }}>
+          <button className="fullscreen-close" onClick={() => setIdeasOpen(false)} style={{ zIndex: 100 }}>×</button>
+          <IdeasView />
         </div>
       )}
     </div>

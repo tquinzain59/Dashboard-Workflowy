@@ -40,6 +40,7 @@ export interface TileConfig {
   color: string;
   type: string;
   onJarvisClick?: () => void;
+  onIdeasClick?: () => void;
 }
 
 export interface BaseTileProps extends TileConfig {

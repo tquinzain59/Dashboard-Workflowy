@@ -13,6 +13,11 @@ export default function FolderTile(props: BaseTileProps) {
       props.onJarvisClick();
       return;
     }
+
+    if (props.type === 'ideas' && props.onIdeasClick) {
+      props.onIdeasClick();
+      return;
+    }
     
     if (!expanded && items.length === 0) {
       fetchNode();
@@ -35,6 +40,7 @@ export default function FolderTile(props: BaseTileProps) {
         <>
           {props.type === 'lecture' && <p>Cliquez pour lire le contenu</p>}
           {props.type === 'jarvis' && <p>Paramètres système & mémoire</p>}
+          {props.type === 'ideas' && <p>Analyses nocturnes en Markdown</p>}
         </>
       )}
 

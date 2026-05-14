@@ -28,7 +28,7 @@ export default function IdeasView() {
       const res = await fetch('/api/workflowy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item_id: '566be6818799' })
+        body: JSON.stringify({ item_id: '1d3b1005-3314-4f0d-b907-566be6818799' })
       });
       
       if (!res.ok) {
@@ -36,8 +36,8 @@ export default function IdeasView() {
       }
       
       const data = await res.json();
-      if (data && data.ch) {
-        setNodes(data.ch);
+      if (data && (data.items || data.ch)) {
+        setNodes(data.items || data.ch);
       } else {
         setNodes([]);
       }
@@ -66,11 +66,11 @@ export default function IdeasView() {
     return null;
   };
 
-  const handleNodeClick = async (node: WorkflowyNode) => {
+  const handleNodeClick = async (node: any) => {
     setSelectedNode(node);
     setMarkdownContent(null);
     
-    const driveId = extractDriveId(node.no) || extractDriveId(node.nm);
+    const driveId = extractDriveId(node.note || node.no) || extractDriveId(node.name || node.nm);
     
     if (!driveId) {
       setMarkdownContent('*(Aucun lien Google Drive trouvé pour cette analyse)*');
@@ -123,7 +123,7 @@ export default function IdeasView() {
                 transition: 'background 0.2s ease',
               }}
             >
-              <div style={{ fontWeight: 500, fontSize: '1.1rem' }}>{node.nm || 'Sans titre'}</div>
+              <div style={{ fontWeight: 500, fontSize: '1.1rem' }}>{node.name || node.nm || 'Sans titre'}</div>
             </li>
           ))}
         </ul>
@@ -143,7 +143,7 @@ export default function IdeasView() {
         ) : markdownContent ? (
           <div className="markdown-body" style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.1rem', lineHeight: 1.6 }}>
             <h1 style={{ marginBottom: '2rem', borderBottom: '2px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-              {selectedNode?.nm}
+              {selectedNode?.name || selectedNode?.nm}
             </h1>
             <ReactMarkdown>{markdownContent}</ReactMarkdown>
           </div>

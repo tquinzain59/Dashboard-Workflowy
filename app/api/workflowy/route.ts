@@ -13,7 +13,8 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${WORKFLOWY_API_KEY}`
       },
-      body: JSON.stringify({ item_id: itemId })
+      body: JSON.stringify({ item_id: itemId }),
+      cache: 'no-store'
     });
 
     if (!response.ok) {

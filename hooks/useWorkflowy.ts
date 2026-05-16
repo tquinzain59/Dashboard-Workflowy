@@ -16,7 +16,7 @@ export function useWorkflowyNode(nodeId: string, autoFetch: boolean = true) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchNode = async (id: string = nodeId): Promise<WorkflowyNode[]> => {
+  const fetchNode = async (id: string = nodeId, retries = 1): Promise<WorkflowyNode[]> => {
     setLoading(true);
     try {
       const res = await fetch('/api/workflowy', {
@@ -30,10 +30,17 @@ export function useWorkflowyNode(nodeId: string, autoFetch: boolean = true) {
       setItems(data);
       return data;
     } catch (err: any) {
+      if (retries > 0) {
+        // Wait 1 second before retrying
+        await new Promise(r => setTimeout(r, 1000));
+        return fetchNode(id, retries - 1);
+      }
       setError(err.message);
       return [];
     } finally {
-      setLoading(false);
+      if (retries === 0 || items.length > 0) {
+        setLoading(false);
+      }
     }
   };
 

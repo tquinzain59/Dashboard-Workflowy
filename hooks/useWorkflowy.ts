@@ -219,7 +219,7 @@ export function useExpenses(nodeId: string) {
 }
 
 export function useDeliveries(nodeId: string) {
-  const { items, loading: rootLoading } = useWorkflowyNode(nodeId, true);
+  const { items, loading: rootLoading, error } = useWorkflowyNode(nodeId, true);
   const [deliveries, setDeliveries] = useState<DeliveryData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -231,7 +231,8 @@ export function useDeliveries(nodeId: string) {
       }
       setLoading(true);
       
-      const promises = items.map(async (item) => {
+      const results: DeliveryData[] = [];
+      for (const item of items) {
          let name = item.name.replace(/<[^>]+>/g, '').replace(/^•\s*/, '').trim();
          
          const parts = name.split(' - ');
@@ -287,7 +288,7 @@ export function useDeliveries(nodeId: string) {
            console.error("Failed to fetch delivery details", e);
          }
          
-         return {
+         results.push({
            id: item.id,
            orderDate,
            site,
@@ -296,10 +297,9 @@ export function useDeliveries(nodeId: string) {
            expectedDelivery,
            price,
            tracking
-         };
-      });
+         });
+      }
       
-      const results = await Promise.all(promises);
       setDeliveries(results);
       setLoading(false);
     }
@@ -311,6 +311,6 @@ export function useDeliveries(nodeId: string) {
     }
   }, [items, rootLoading]);
   
-  return { deliveries, loading };
+  return { deliveries, loading, error };
 }
 

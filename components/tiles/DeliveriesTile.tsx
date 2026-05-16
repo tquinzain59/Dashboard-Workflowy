@@ -5,7 +5,7 @@ import { useDeliveries } from '@/hooks/useWorkflowy';
 
 export default function DeliveriesTile(props: BaseTileProps) {
   const [expanded, setExpanded] = useState(false);
-  const { deliveries, loading } = useDeliveries(props.id);
+  const { deliveries, loading, error } = useDeliveries(props.id);
 
   const handleExpandToggle = () => {
     setExpanded(!expanded);
@@ -25,7 +25,9 @@ export default function DeliveriesTile(props: BaseTileProps) {
     <TileContainer {...props} expanded={expanded} onExpandToggle={handleExpandToggle}>
       {!expanded && (
         <div style={{ textAlign: 'center', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {loading ? (
+          {error ? (
+            <p style={{ fontSize: '1rem', color: '#ff9800', margin: 0 }}>⚠️ Limite d'API ou Erreur réseau</p>
+          ) : loading ? (
             <p style={{ fontSize: '1.2rem', margin: 0, opacity: 0.7 }}>Chargement...</p>
           ) : (
             <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
@@ -37,7 +39,9 @@ export default function DeliveriesTile(props: BaseTileProps) {
 
       {expanded && (
         <div className="deliveries-container" style={{ padding: '10px', height: '100%', overflowY: 'auto' }}>
-          {loading ? (
+          {error ? (
+             <div style={{ textAlign: 'center', padding: '20px', color: '#ff9800' }}>⚠️ Une erreur réseau est survenue. Workflowy limite peut-être les requêtes, réessayez plus tard.</div>
+          ) : loading ? (
             <div style={{ textAlign: 'center', padding: '20px', opacity: 0.7 }}>Chargement des détails...</div>
           ) : deliveries.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '20px', opacity: 0.7 }}>Aucune donnée trouvée</div>

@@ -5,7 +5,7 @@ import { useDeliveries } from '@/hooks/useWorkflowy';
 
 export default function DeliveriesTile(props: BaseTileProps) {
   const [expanded, setExpanded] = useState(false);
-  const { deliveries, loading, error } = useDeliveries(props.id);
+  const { deliveries, loading, error, totalItems } = useDeliveries(props.id, expanded);
 
   const handleExpandToggle = () => {
     setExpanded(!expanded);
@@ -26,12 +26,12 @@ export default function DeliveriesTile(props: BaseTileProps) {
       {!expanded && (
         <div style={{ textAlign: 'center', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {error ? (
-            <p style={{ fontSize: '1rem', color: '#ff9800', margin: 0 }}>⚠️ Limite d'API ou Erreur réseau</p>
+            <p style={{ fontSize: '1rem', color: '#ff9800', margin: 0 }}>⚠️ Erreur réseau</p>
           ) : loading ? (
             <p style={{ fontSize: '1.2rem', margin: 0, opacity: 0.7 }}>Chargement...</p>
           ) : (
             <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
-               {activeDeliveries.length > 0 ? `${activeDeliveries.length} en cours` : 'Aucune livraison'}
+               {totalItems > 0 ? `${totalItems} livraisons` : 'Aucune livraison'}
             </p>
           )}
         </div>
@@ -47,7 +47,12 @@ export default function DeliveriesTile(props: BaseTileProps) {
             <div style={{ textAlign: 'center', padding: '20px', opacity: 0.7 }}>Aucune donnée trouvée</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {deliveries.map(d => {
+              {deliveries.filter(d => !d.state.toLowerCase().includes('livré') && !d.state.toLowerCase().includes('reçus')).length === 0 && deliveries.length > 0 && (
+                <div style={{ textAlign: 'center', padding: '10px', background: 'rgba(76, 175, 80, 0.1)', borderRadius: '8px', color: '#4caf50' }}>
+                  Toutes les livraisons sont terminées ! 🎉
+                </div>
+              )}
+              {deliveries.filter(d => !d.state.toLowerCase().includes('livré') && !d.state.toLowerCase().includes('reçus')).map(d => {
                 const isCompleted = d.state.toLowerCase().includes('livré') || d.state.toLowerCase().includes('reçus');
                 const isReturn = d.state.toLowerCase().includes('retour') || d.state.toLowerCase().includes('rembours');
                 let borderColor = '#ff9800'; // warning/orange for in transit

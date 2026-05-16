@@ -218,15 +218,14 @@ export function useExpenses(nodeId: string) {
   return { parsedData, loading: loading || (!parsedData && items.length > 0) };
 }
 
-export function useDeliveries(nodeId: string) {
+export function useDeliveries(nodeId: string, shouldFetchDetails: boolean) {
   const { items, loading: rootLoading, error } = useWorkflowyNode(nodeId, true);
   const [deliveries, setDeliveries] = useState<DeliveryData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchDetails() {
-      if (!items || items.length === 0) {
-        setLoading(false);
+      if (!items || items.length === 0 || !shouldFetchDetails) {
         return;
       }
       setLoading(true);
@@ -304,13 +303,11 @@ export function useDeliveries(nodeId: string) {
       setLoading(false);
     }
     
-    if (items.length > 0) {
+    if (items.length > 0 && shouldFetchDetails && deliveries.length === 0) {
       fetchDetails();
-    } else if (!rootLoading) {
-      setLoading(false);
     }
-  }, [items, rootLoading]);
+  }, [items, rootLoading, shouldFetchDetails]);
   
-  return { deliveries, loading, error };
+  return { deliveries, loading: rootLoading || loading, error, totalItems: items.length };
 }
 

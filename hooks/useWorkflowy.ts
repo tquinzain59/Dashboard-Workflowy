@@ -254,16 +254,32 @@ export function useDeliveries(nodeId: string) {
            const children = json.items || [];
            
            for (const child of children) {
-             const childName = child.name.replace(/<[^>]+>/g, '').replace(/^→\s*/, '').replace(/^📬\s*/, '').trim();
-             if (childName.includes('État :')) {
-               state = childName.split('État :')[1]?.trim() || childName;
-             } else if (childName.includes('Livraison prévue :')) {
-               expectedDelivery = childName.split('Livraison prévue :')[1]?.trim() || childName;
-             } else if (childName.includes('Prix :')) {
-               price = childName.split('Prix :')[1]?.trim() || childName;
-             } else if (childName.includes('Tracking :') || childName.includes('Suivi :')) {
-               tracking = childName.split('Tracking :')[1]?.trim() || childName;
-             } else if (childName.includes('Retour déposé') || childName.includes('Remboursement')) {
+             const rawText = child.name + (child.note ? ' ' + child.note : '');
+             let childName = rawText.replace(/<[^>]+>/g, '')
+                                    .replace(/&nbsp;/g, ' ')
+                                    .replace(/&amp;/g, '&')
+                                    .replace(/&lt;/g, '<')
+                                    .replace(/&gt;/g, '>')
+                                    .replace(/&#201;/g, 'É')
+                                    .replace(/&Eacute;/gi, 'É')
+                                    .replace(/^→\s*/, '')
+                                    .replace(/^📬\s*/, '')
+                                    .trim();
+             
+             const stateMatch = childName.match(/(?:État|Etat|Statut)\s*:\s*(.*)/i);
+             const deliveryMatch = childName.match(/(?:Livraison prévue|Prévu(?:e)?)\s*:\s*(.*)/i);
+             const priceMatch = childName.match(/(?:Prix|Montant)\s*:\s*(.*)/i);
+             const trackingMatch = childName.match(/(?:Tracking|Suivi)\s*:\s*(.*)/i);
+
+             if (stateMatch) {
+               state = stateMatch[1].trim();
+             } else if (deliveryMatch) {
+               expectedDelivery = deliveryMatch[1].trim();
+             } else if (priceMatch) {
+               price = priceMatch[1].trim();
+             } else if (trackingMatch) {
+               tracking = trackingMatch[1].trim();
+             } else if (childName.toLowerCase().includes('retour') || childName.toLowerCase().includes('rembours')) {
                if (!state) state = childName; 
              }
            }

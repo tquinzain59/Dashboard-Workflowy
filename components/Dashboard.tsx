@@ -10,6 +10,7 @@ const TARGET_NODES = [
   { id: "weather", name: "☁️ Météo Lille", color: "var(--metro-blue)", type: "weather" },
   { id: "calendar", name: "📅 Mon Agenda", color: "var(--metro-yellow)", type: "calendar" },
   { id: "gmail", name: "📧 Gmail Urgents", color: "var(--metro-red)", type: "gmail" },
+  { id: "80bf43a7-6ad8-11ae-9413-ce411c280c9c", name: "📦 Livraisons", color: "var(--metro-blue)", type: "deliveries" },
   { id: "08a049b5-462c-40c0-99f3-1e804e59a346", name: "🤖 Jarvis", color: "var(--metro-teal)", type: "jarvis" },
   { id: "1d3b1005-3314-4f0d-b907-566be6818799", name: "💡 Ideas", color: "var(--metro-yellow)", type: "ideas" },
   { id: "88e43dd4-f6e9-4bc8-bf0c-938087e84c8c", name: "💸 Dépenses LLM", color: "var(--metro-purple)", type: "expenses" },

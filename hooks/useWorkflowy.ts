@@ -218,3 +218,83 @@ export function useExpenses(nodeId: string) {
   return { parsedData, loading: loading || (!parsedData && items.length > 0) };
 }
 
+export function useDeliveries(nodeId: string) {
+  const { items, loading: rootLoading } = useWorkflowyNode(nodeId, true);
+  const [deliveries, setDeliveries] = useState<DeliveryData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDetails() {
+      if (!items || items.length === 0) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      
+      const promises = items.map(async (item) => {
+         let name = item.name.replace(/<[^>]+>/g, '').replace(/^•\s*/, '').trim();
+         
+         const parts = name.split(' - ');
+         const orderDate = parts[0]?.trim() || '';
+         const site = parts[1]?.trim() || '';
+         const description = parts.slice(2).join(' - ').trim() || '';
+         
+         let state = '';
+         let expectedDelivery = '';
+         let price = '';
+         let tracking = '';
+         
+         try {
+           const res = await fetch('/api/workflowy', { 
+             method: 'POST', 
+             headers: { 'Content-Type': 'application/json' }, 
+             body: JSON.stringify({ item_id: item.id }) 
+           });
+           const json = await res.json();
+           const children = json.items || [];
+           
+           for (const child of children) {
+             const childName = child.name.replace(/<[^>]+>/g, '').replace(/^→\s*/, '').replace(/^📬\s*/, '').trim();
+             if (childName.includes('État :')) {
+               state = childName.split('État :')[1]?.trim() || childName;
+             } else if (childName.includes('Livraison prévue :')) {
+               expectedDelivery = childName.split('Livraison prévue :')[1]?.trim() || childName;
+             } else if (childName.includes('Prix :')) {
+               price = childName.split('Prix :')[1]?.trim() || childName;
+             } else if (childName.includes('Tracking :') || childName.includes('Suivi :')) {
+               tracking = childName.split('Tracking :')[1]?.trim() || childName;
+             } else if (childName.includes('Retour déposé') || childName.includes('Remboursement')) {
+               if (!state) state = childName; 
+             }
+           }
+         } catch(e) {
+           console.error("Failed to fetch delivery details", e);
+         }
+         
+         return {
+           id: item.id,
+           orderDate,
+           site,
+           description,
+           state,
+           expectedDelivery,
+           price,
+           tracking
+         };
+      });
+      
+      const results = await Promise.all(promises);
+      setDeliveries(results);
+      setLoading(false);
+    }
+    
+    if (items.length > 0) {
+      fetchDetails();
+    } else if (!rootLoading) {
+      setLoading(false);
+    }
+  }, [items, rootLoading]);
+  
+  return { deliveries, loading };
+}
+

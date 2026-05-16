@@ -38,6 +38,17 @@ export interface ExpensesData {
   totalAujourdHui?: string;
 }
 
+export interface DeliveryData {
+  id: string;
+  orderDate: string;
+  site: string;
+  description: string;
+  state: string;
+  expectedDelivery: string;
+  price: string;
+  tracking: string;
+}
+
 export interface TileConfig {
   id: string;
   name: string;

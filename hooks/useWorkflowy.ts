@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { WorkflowyNode, ExpensesData } from '@/types';
+import { WorkflowyNode, ExpensesData, DeliveryData } from '@/types';
 
 export const parseDateFromName = (name: string): Date | null => {
   if (!name) return null;

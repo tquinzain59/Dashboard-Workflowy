@@ -28,6 +28,7 @@ export function useWorkflowyNode(nodeId: string, autoFetch: boolean = true) {
       const json = await res.json();
       const data = json.items || [];
       setItems(data);
+      setLoading(false);
       return data;
     } catch (err: any) {
       if (retries > 0) {
@@ -36,11 +37,8 @@ export function useWorkflowyNode(nodeId: string, autoFetch: boolean = true) {
         return fetchNode(id, retries - 1);
       }
       setError(err.message);
+      setLoading(false);
       return [];
-    } finally {
-      if (retries === 0 || items.length > 0) {
-        setLoading(false);
-      }
     }
   };
 

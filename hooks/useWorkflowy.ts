@@ -249,47 +249,63 @@ export function useDeliveries(nodeId: string, shouldFetchDetails: boolean) {
          let price = '';
          let tracking = '';
          
-         try {
-           const res = await fetch('/api/workflowy', { 
-             method: 'POST', 
-             headers: { 'Content-Type': 'application/json' }, 
-             body: JSON.stringify({ item_id: item.id }) 
-           });
-           const json = await res.json();
-           const children = json.items || [];
-           
-           for (const child of children) {
-             const rawText = child.name + (child.note ? ' ' + child.note : '');
-             let childName = rawText.replace(/<[^>]+>/g, '')
-                                    .replace(/&nbsp;/g, ' ')
-                                    .replace(/&amp;/g, '&')
-                                    .replace(/&lt;/g, '<')
-                                    .replace(/&gt;/g, '>')
-                                    .replace(/&#201;/g, 'É')
-                                    .replace(/&Eacute;/gi, 'É')
-                                    .replace(/^→\s*/, '')
-                                    .replace(/^📬\s*/, '')
-                                    .trim();
-             
-             const stateMatch = childName.match(/(?:État|Etat|Statut)\s*:\s*(.*)/i);
-             const deliveryMatch = childName.match(/(?:Livraison prévue|Prévu(?:e)?)\s*:\s*(.*)/i);
-             const priceMatch = childName.match(/(?:Prix|Montant)\s*:\s*(.*)/i);
-             const trackingMatch = childName.match(/(?:Tracking|Suivi)\s*:\s*(.*)/i);
+         let success = false;
+         let retries = 2;
 
-             if (stateMatch) {
-               state = stateMatch[1].trim();
-             } else if (deliveryMatch) {
-               expectedDelivery = deliveryMatch[1].trim();
-             } else if (priceMatch) {
-               price = priceMatch[1].trim();
-             } else if (trackingMatch) {
-               tracking = trackingMatch[1].trim();
-             } else if (childName.toLowerCase().includes('retour') || childName.toLowerCase().includes('rembours')) {
-               if (!state) state = childName; 
+         while (!success && retries >= 0) {
+           try {
+             // Artificial delay to prevent rate limiting
+             await new Promise(r => setTimeout(r, 600));
+
+             const res = await fetch('/api/workflowy', { 
+               method: 'POST', 
+               headers: { 'Content-Type': 'application/json' }, 
+               body: JSON.stringify({ item_id: item.id }) 
+             });
+
+             if (!res.ok) throw new Error('Erreur réseau Workflowy Details');
+             
+             const json = await res.json();
+             const children = json.items || [];
+             success = true;
+             
+             for (const child of children) {
+               const rawText = child.name + (child.note ? ' ' + child.note : '');
+               let childName = rawText.replace(/<[^>]+>/g, '')
+                                      .replace(/&nbsp;/g, ' ')
+                                      .replace(/&amp;/g, '&')
+                                      .replace(/&lt;/g, '<')
+                                      .replace(/&gt;/g, '>')
+                                      .replace(/&#201;/g, 'É')
+                                      .replace(/&Eacute;/gi, 'É')
+                                      .replace(/^→\s*/, '')
+                                      .replace(/^📬\s*/, '')
+                                      .trim();
+               
+               const stateMatch = childName.match(/(?:État|Etat|Statut)\s*:\s*(.*)/i);
+               const deliveryMatch = childName.match(/(?:Livraison prévue|Prévu(?:e)?)\s*:\s*(.*)/i);
+               const priceMatch = childName.match(/(?:Prix|Montant)\s*:\s*(.*)/i);
+               const trackingMatch = childName.match(/(?:Tracking|Suivi)\s*:\s*(.*)/i);
+  
+               if (stateMatch) {
+                 state = stateMatch[1].trim();
+               } else if (deliveryMatch) {
+                 expectedDelivery = deliveryMatch[1].trim();
+               } else if (priceMatch) {
+                 price = priceMatch[1].trim();
+               } else if (trackingMatch) {
+                 tracking = trackingMatch[1].trim();
+               } else if (childName.toLowerCase().includes('retour') || childName.toLowerCase().includes('rembours')) {
+                 if (!state) state = childName; 
+               }
+             }
+           } catch(e) {
+             console.error("Failed to fetch delivery details, retrying...", e);
+             retries--;
+             if (retries < 0) {
+               console.error("Given up on fetching details for item", item.id);
              }
            }
-         } catch(e) {
-           console.error("Failed to fetch delivery details", e);
          }
          
          results.push({

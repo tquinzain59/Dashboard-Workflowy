@@ -319,3 +319,318 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #666;
 }
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* App Layout */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header & Stats */
+.header {
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-main);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+/* Controls (Search, Filter, Actions) */
+.controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  align-items: center;
+}
+
+.control-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  outline: none;
+  min-width: 200px;
+  flex: 1;
+}
+
+.control-input:focus {
+  border-color: var(--accent-cyan);
+}
+
+.control-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
+
+.btn {
+  background: var(--bg-input);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:hover {
+  background: var(--border-color);
+}
+
+.btn-primary {
+  background: var(--accent-cyan);
+  color: #000;
+  border-color: var(--accent-cyan);
+}
+
+.btn-primary:hover {
+  background: #00b38f;
+  border-color: #00b38f;
+}
+
+/* Delivery Grid */
+.deliveries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* Delivery Card */
+.delivery-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.delivery-card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.card-vendor {
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-date {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-price {
+  font-weight: 600;
+  color: var(--accent-cyan);
+  font-size: 15px;
+}
+
+/* Status Pill */
+.status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Mini Timeline */
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 17px;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  background: var(--border-color);
+  z-index: 1;
+}
+
+.timeline-step {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.timeline-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  transition: all 0.3s;
+}
+
+.timeline-step.active .timeline-dot {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 8px rgba(0, 212, 170, 0.5);
+}
+
+.timeline-label {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.timeline-step.active .timeline-label {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+/* Expanded Details */
+.card-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  font-size: 13px;
+  color: var(--text-dim);
+  animation: slideDown 0.3s ease-out;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.detail-label {
+  width: 120px;
+  color: var(--text-dim);
+}
+
+.detail-value {
+  flex: 1;
+  color: var(--text-main);
+}
+
+.detail-value a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+.detail-value a:hover {
+  text-decoration: underline;
+}
+
+/* Status colors map */
+.status-traité { background: rgba(0, 123, 255, 0.15); color: #66b2ff; border: 1px solid rgba(0, 123, 255, 0.3); }
+.status-expédié { background: rgba(0, 212, 170, 0.15); color: var(--accent-cyan); border: 1px solid rgba(0, 212, 170, 0.3); }
+.status-livré { background: rgba(76, 175, 80, 0.15); color: #81c784; border: 1px solid rgba(76, 175, 80, 0.3); }
+.status-retour { background: rgba(255, 107, 53, 0.15); color: var(--accent-orange); border: 1px solid rgba(255, 107, 53, 0.3); }
+.status-remboursé { background: rgba(255, 235, 59, 0.15); color: #fff176; border: 1px solid rgba(255, 235, 59, 0.3); }
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Loader */
+.loader {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  color: var(--accent-cyan);
+  font-weight: 500;
+}

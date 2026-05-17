@@ -31,7 +31,7 @@ async function fetchAllRecords(): Promise<AirtableDelivery[]> {
   let records: AirtableDelivery[] = [];
   let offset: string | null = null;
   do {
-    const fetchUrl = offset ? `/api/airtable?offset=${offset}` : `/api/airtable`;
+    const fetchUrl: string = offset ? `/api/airtable?offset=${offset}` : `/api/airtable`;
     const response = await fetch(fetchUrl, {
       cache: 'no-store'
     });
